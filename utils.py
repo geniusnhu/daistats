@@ -96,8 +96,8 @@ def movement_chart(data, chart_title = '', fig_name='chart.html', file_save=Fals
     fig.update_xaxes(title_text="")
     fig.update_yaxes(title_text="Vault loan (USD)", secondary_y=False)
     fig.update_yaxes(title_text="Vault coin locked amount", secondary_y=True)
-    if file_save:
-        fig.write_html(fig_name)
+    #if file_save:
+    #    fig.write_html(fig_name)
     return fig
 
 def coin_diff(data, chart_title = '', fig_name='chart.html', file_save=False):
@@ -118,7 +118,7 @@ def coin_diff(data, chart_title = '', fig_name='chart.html', file_save=False):
     )
     fig.update_xaxes(title_text="")
     fig.update_yaxes(title_text="Amount of coin locked difference")
-    if file_save:
-        fig.write_html(fig_name)
+    #if file_save:
+    #    fig.write_html(fig_name)
 
     return fig
