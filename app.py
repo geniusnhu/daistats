@@ -37,7 +37,7 @@ if args['streamlit']:
 else:
     pass
 
-data = pd.read_csv('/daistats_data.csv')
+data = pd.read_csv('daistats_data.csv')
 
 # ================== 1. Ratio by vault ==================
 total_loan = data['current_loan'].sum()
