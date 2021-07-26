@@ -100,7 +100,7 @@ def movement_chart(data, chart_title = '', fig_name='chart.html', file_save=Fals
     #    fig.write_html(fig_name)
     return fig
 
-def coin_diff(data, chart_title = '', fig_name='chart.html', file_save=False):
+def coin_diff(data, chart_title = '', fig_name='chart.html', file_save=False): 
     data['amount_coin_diff'] = data['amount_coin_locked'].diff()
     data['diff_neg_pos'] = data['amount_coin_diff'].map(lambda x: 'neg' if x<0 else 'pos')
     fig = px.bar(
