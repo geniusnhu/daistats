@@ -24,6 +24,7 @@ parent_dir = os.getcwd()
 path = os.path.dirname(parent_dir) # Go up one level to the common parent directory
 #sys.path.append(path)
 
+#result_path = path+'/daistats_images/'
 result_path = path+'/daistats_images/'
 
 if args['streamlit']:
@@ -55,7 +56,7 @@ fig1.update_traces(
     hovertemplate=None
 )
 fig1.update_layout(title="<b>Ratio by vault</b>", hovermode="x unified")
-fig1.write_html(result_path + "vault_ratio.html")
+#fig1.write_html(result_path + "vault_ratio.html")
 if args['streamlit']:
     st.markdown('## **OVERVIEW**')
     st.plotly_chart(fig1)
