@@ -62,56 +62,113 @@ if args['streamlit']:
     st.plotly_chart(fig1)
 
 st.markdown("--")
-#---------------------------------------------------------------#
-# SELECT VAULT AND SETUP DATA
-#---------------------------------------------------------------#
+
+#===============================================================#
+# SELECT VAULT AND IN-DEPT MOVEMENT
+#===============================================================#
 # Create drop down bar -----------------------------------------
 sorted_vaults = data.groupby('vault_name')['current_loan'].sum()\
     .sort_values(ascending=False).index
 
-st.markdown("## **Select Vault:**")
-sorted_vault = st.multiselect('', sorted_vaults, default=['ETH-A'])
-#sorted_vault = []
-#sorted_vault.append(st.selectbox('', sorted_vaults))
+st.markdown("# **IN-DEPT MOVEMENT**")
+st.markdown("### Choose one or several vaults below and explore In-dept movement")
+st.markdown("### **Select Vault:**")
+
+sorted_vault = st.multiselect(
+    'Choose one or several vaults in-dept performance', sorted_vaults, default=['ETH-A'],
+    #help = 'Test help'
+)
 
 # Filter df based on selection---------------------------------
 vault_df = data[data['vault_name'].isin(sorted_vault)]
 vault_df['timestamp_date'] = vault_df['timestamp'].map(lambda x: str(x).split(' ')[0])
 
 if len(sorted_vault) == 1:
-    st.markdown(f"### Current fee: " +\
+    st.markdown(f"### Current vault fee: " +\
                 f"{vault_df.loc[vault_df['timestamp_date']==np.max(vault_df['timestamp_date']),'fee'].values[0]}")
 else:
     vault_df = data[data['vault_name'].isin(sorted_vault)].groupby('timestamp').sum().reset_index(drop=False)
     vault_df['timestamp_date'] = vault_df['timestamp'].map(lambda x: str(x).split(' ')[0])
 
-st.markdown(f"### Selected vault(s): {', '.join([i for i in sorted_vault])}")
+#st.markdown(f"### Selected vault(s): {', '.join([i for i in sorted_vault])}")
 
 # Plot figures ------------------------------------------------
 col1, col2 = st.beta_columns(2)
 
-fig2 = movement_chart(
-    data=vault_df, chart_title = 'Loan amount in USD', fig_name=result_path + "USDC_loan.html",
+fig1 = movement_chart(
+    data=vault_df, fig_name=result_path + "USDC_loan.html", chart_title = '',
     file_save=args['fig_save']
 )
 if args['streamlit']:
     with col1:
-        st.plotly_chart(fig2, use_container_width=True)
+        col1.header('Vault loan amount')
+        st.plotly_chart(fig1, use_container_width=True)
 else:
     pass
 
 # Daily changes in coin locked vs the previous day
-fig4 = coin_diff(
-    vault_df, chart_title = 'Changes in coin locked amount',
+fig2 = coin_diff(
+    vault_df, chart_title = '',
     fig_name=result_path + "ETHA_daily_diff.html",
     file_save=args['fig_save']
 )
 if args['streamlit']:
     with col2:
-        st.plotly_chart(fig4, use_container_width=True)
+        col2.header('Changes in coin locked')
+        col2.subheader('')
+        st.plotly_chart(fig2, use_container_width=True)
         with st.beta_expander("See explanation"):
             st.write("""
-                Net Change in amount of coin locked.
+                Net Change in amount of coin locked vs previous day.
 
                 *Note that data of different vaults might not be updated with the same timestamp*
                 """)
+
+#===============================================================#
+# SELECT VAULT AND SETUP DATA
+#===============================================================#
+
+st.markdown("# **RICH WALLET MOVEMENT**")
+st.markdown("### Movement of the third richest Bitcoin wallet. Source data on [bitinfocharts](https://bitinfocharts.com/bitcoin/address/1P5ZEDWTKTFGxQjZphgWPQUpe554WKDfHQ)")
+st.write('')
+
+# Load data
+data = pd.read_csv('rich_wallet.csv')
+data['timestamp_date'] = data['timestamp'].map(lambda x: str(x).split(' ')[0])
+
+# DCA price
+DCA_price = data['Amount'] * data['Realized price']
+DCA_price = round(DCA_price.sum()/data.loc[0,'Balance'], 2)
+st.markdown(f"### DCA price: ${DCA_price:,}")
+
+# Plot figures ------------------------------------------------
+#col3, col4 = st.beta_columns(2)
+
+fig3 = wallet_movement_chart(
+    data=data, chart_title = '', fig_name=result_path + "rich_wallet_balance.html",
+    file_save=args['fig_save']
+)
+if args['streamlit']:
+    st.markdown("## Wallet balance")
+    st.plotly_chart(fig3, use_container_width=True)
+    # with col3:
+    #     col3.header('Wallet balance')
+    #     st.plotly_chart(fig3, use_container_width=True)
+else:
+    pass
+
+# Drop date that has movement < 0.1 BTC
+data_diff = data[(data['Amount']>=0.1) | (data['Amount']<=-0.1)]
+fig4 = balance_diff(
+    data_diff, chart_title = '',
+    fig_name=result_path + "wallet_diff.html",
+    file_save=args['fig_save']
+)
+
+if args['streamlit']:
+    st.markdown("## Changes in balance")
+    st.plotly_chart(fig4, use_container_width=True)
+    # with col4:
+    #     col4.header('Changes in balance')
+    #     col4.subheader('')
+    #     st.plotly_chart(fig4, use_container_width=True)
