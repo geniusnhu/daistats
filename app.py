@@ -87,10 +87,10 @@ if len(sorted_vault) == 1:
     st.markdown(f"### Current vault fee: " +\
                 f"{vault_df.loc[vault_df['timestamp_date']==np.max(vault_df['timestamp_date']),'fee'].values[0]}")
 else:
-    vault_df = data[data['vault_name'].isin(sorted_vault)].groupby('timestamp').sum().reset_index(drop=False)
-    vault_df['timestamp_date'] = vault_df['timestamp'].map(lambda x: str(x).split(' ')[0])
-
-#st.markdown(f"### Selected vault(s): {', '.join([i for i in sorted_vault])}")
+    #vault_df['timestamp_date'] = vault_df['timestamp'].map(lambda x: str(x).split(' ')[0])
+    #vault_df = data[data['vault_name'].isin(sorted_vault)].groupby('timestamp_date').sum().reset_index(drop=False)
+    vault_df = vault_df.groupby(['vault_name','timestamp_date']).mean().reset_index(drop=False)
+    vault_df = vault_df.groupby('timestamp_date').sum().reset_index(drop=False)
 
 # Plot figures ------------------------------------------------
 col1, col2 = st.beta_columns(2)
@@ -112,14 +112,19 @@ fig2 = coin_diff(
     fig_name=result_path + "ETHA_daily_diff.html",
     file_save=args['fig_save']
 )
+
+if len(sorted_vault) == 1:
+    coin = sorted_vault[0].split('-')[0]
+else:
+    coin = ', '.join(list(set([i.split('-')[0] for i in sorted_vault])))
 if args['streamlit']:
     with col2:
-        col2.header('Changes in coin locked')
+        col2.header(f'Changes in {coin} locked')
         col2.subheader('')
         st.plotly_chart(fig2, use_container_width=True)
         with st.beta_expander("See explanation"):
             st.write("""
-                Net Change in amount of coin locked vs previous day.
+                Net Change in amount of coin(s) locked vs previous day. The illustrated number is the total number of coins regardless its difference in nature.
 
                 *Note that data of different vaults might not be updated with the same timestamp*
                 """)
