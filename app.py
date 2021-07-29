@@ -128,7 +128,7 @@ if args['streamlit']:
 # SELECT VAULT AND SETUP DATA
 #===============================================================#
 
-st.markdown("# **RICH WALLET MOVEMENT**")
+st.markdown("# 🐳 **RICH WALLET MOVEMENT** 🐳")
 st.markdown("### Movement of the third richest Bitcoin wallet. Source data on [bitinfocharts](https://bitinfocharts.com/bitcoin/address/1P5ZEDWTKTFGxQjZphgWPQUpe554WKDfHQ)")
 st.write('')
 
