@@ -147,7 +147,11 @@ DCA_price = round(DCA_price.sum()/data.loc[0,'Balance'], 2)
 st.markdown(f"### DCA price: ${DCA_price:,}")
 
 # Plot figures ------------------------------------------------
-#col3, col4 = st.beta_columns(2)
+
+data = data.groupby('timestamp_date').agg({'Amount': 'sum', 'Realized price': 'mean'}).reset_index(drop=False)
+data['Balance'] = data['Amount'].cumsum()
+data['Balance USD'] = data['Balance'] * data['Realized price']
+data = data.dropna()
 
 fig3 = wallet_movement_chart(
     data=data, chart_title = '', fig_name=result_path + "rich_wallet_balance.html",
