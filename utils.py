@@ -73,6 +73,9 @@ def summary_vault(data):
 
 
 def movement_chart(data, chart_title = '', fig_name='chart.html', file_save=False):
+    data['timestamp_date'] = pd.DatetimeIndex(data['timestamp_date'])
+    data = data.sort_values(by = 'timestamp_date')
+
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig.add_trace(
         go.Scatter(
@@ -103,6 +106,8 @@ def movement_chart(data, chart_title = '', fig_name='chart.html', file_save=Fals
 def coin_diff(data, chart_title = '', fig_name='chart.html', file_save=False):
     data['amount_coin_diff'] = data['amount_coin_locked'].diff()
     data['diff_neg_pos'] = data['amount_coin_diff'].map(lambda x: 'neg' if x<0 else 'pos')
+    data['timestamp_date'] = pd.DatetimeIndex(data['timestamp_date'])
+    data = data.dropna().sort_values(by = 'timestamp_date')
     fig = px.bar(
         data, x='timestamp_date', y='amount_coin_diff', color="diff_neg_pos",
         color_discrete_map = {'neg': '#F63366', 'pos': '#2BB1BB'}
@@ -116,7 +121,7 @@ def coin_diff(data, chart_title = '', fig_name='chart.html', file_save=False):
         title="<b>"+chart_title+"<b>", #plot_bgcolor='rgb(255, 255, 255)',
         hovermode="x", template = "simple_white",
     )
-    fig.update_xaxes(title_text="") #, type='date')
+    fig.update_xaxes(title_text="", type='date') #, tickformat="%b\n%Y")
     fig.update_yaxes(title_text="Amount of coin locked difference")
     #if file_save:
     #    fig.write_html(fig_name)

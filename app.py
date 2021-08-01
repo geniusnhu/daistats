@@ -87,8 +87,6 @@ if len(sorted_vault) == 1:
     st.markdown(f"### Current vault fee: " +\
                 f"{vault_df.loc[vault_df['timestamp_date']==np.max(vault_df['timestamp_date']),'fee'].values[0]}")
 else:
-    #vault_df['timestamp_date'] = vault_df['timestamp'].map(lambda x: str(x).split(' ')[0])
-    #vault_df = data[data['vault_name'].isin(sorted_vault)].groupby('timestamp_date').sum().reset_index(drop=False)
     vault_df = vault_df.groupby(['vault_name','timestamp_date']).mean().reset_index(drop=False)
     vault_df = vault_df.groupby('timestamp_date').sum().reset_index(drop=False)
 
