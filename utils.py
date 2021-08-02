@@ -9,6 +9,7 @@ import plotly.offline as py
 import plotly.express as px
 from plotly.graph_objs import *
 
+from itertools import cycle
 
 def summary_vault(data):
     #MAKE SUBPLOTS
@@ -164,25 +165,46 @@ def wallet_movement_chart(data, chart_title = '', fig_name='chart.html', file_sa
     #    fig.write_html(fig_name)
     return fig
 
-def balance_diff(data, chart_title = '', fig_name='chart.html', file_save=False):
+def balance_diff(data, btc_data, chart_title = '', fig_name='chart.html', file_save=False):
     data['diff_neg_pos'] = data['Amount'].map(lambda x: 'neg' if x<0 else 'pos')
+
+    # Create main chart with 2 y axis
+    subfig = make_subplots(specs=[[{"secondary_y": True}]])
+
+    # Bar chart for Balance difference
     fig = px.bar(
         data, x='timestamp_date', y='Amount', color="diff_neg_pos",
-        color_discrete_map = {'neg': '#F63366', 'pos': '#2BB1BB'},
-        height=600
+        color_discrete_map = {'neg': '#F63366', 'pos': '#2BB1BB'}
     )
+    names = cycle(['Positive change', 'Negative change'])
+    fig.for_each_trace(lambda t:  t.update(name = next(names)))
 
-    fig.update_traces(
-        showlegend=False,
+    # Line chart for BTC price
+    fig2 = px.line(btc_data, x='Date', y='Closing Price (USD)')
+    fig2.update_traces(yaxis="y2", line=dict(width=2, color='#E4D00A'), name = 'BTC price')
+
+    # Update 2 charts into the main chart
+    subfig.add_traces(fig.data + fig2.data)
+    subfig.update_xaxes(title_text="", rangeslider_visible=True) #, type='date')
+    subfig.layout.yaxis.title="Balance change (BTC)"
+    subfig.layout.yaxis2.title="Price (USD)"
+    subfig.update_traces(
+        showlegend=True,
         hovertemplate = 'Change: %{y} BTC<extra></extra>', #y:.2f
     )
-    fig.update_layout(
+    subfig.update_layout(
         title="<b>"+chart_title+"<b>", #plot_bgcolor='rgb(255, 255, 255)',
         hovermode="x", template = "none",
+        height=600,
+        legend=dict(
+            yanchor="top",
+            y=0.99,
+            xanchor="left",
+            x=0.01
+        ),
     )
-    fig.update_xaxes(title_text="", rangeslider_visible=True) #, type='date')
-    fig.update_yaxes(title_text="BTC")
-    #if file_save:
-    #    fig.write_html(fig_name)
 
-    return fig
+    #if file_save:
+    #    subfig.write_html(fig_name)
+
+    return subfig

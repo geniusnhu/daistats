@@ -24,7 +24,6 @@ parent_dir = os.getcwd()
 path = os.path.dirname(parent_dir) # Go up one level to the common parent directory
 #sys.path.append(path)
 
-#result_path = path+'/daistats_images/'
 result_path = path+'/daistats_images/'
 
 if args['streamlit']:
@@ -128,7 +127,7 @@ if args['streamlit']:
                 """)
 
 #===============================================================#
-# SELECT VAULT AND SETUP DATA
+# RICH WALLET MOVEMENT
 #===============================================================#
 
 st.markdown("# 🐳 **RICH WALLET MOVEMENT** 🐳")
@@ -138,6 +137,9 @@ st.write('')
 # Load data
 data = pd.read_csv('rich_wallet.csv')
 data['timestamp_date'] = data['timestamp'].map(lambda x: str(x).split(' ')[0])
+# Load BTC price data
+btc_data = pd.read_csv('BTC_price.csv')
+btc_data = btc_data[btc_data['Date']>=data['timestamp_date'].min()]
 
 # DCA price
 DCA_price = data['Amount'] * data['Realized price']
@@ -167,7 +169,7 @@ else:
 # Drop date that has movement < 0.1 BTC
 data_diff = data[(data['Amount']>=0.1) | (data['Amount']<=-0.1)]
 fig4 = balance_diff(
-    data_diff, chart_title = '',
+    data_diff, btc_data, chart_title = '',
     fig_name=result_path + "wallet_diff.html",
     file_save=args['fig_save']
 )
