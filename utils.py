@@ -181,13 +181,13 @@ def balance_diff(data, btc_data, chart_title = '', fig_name='chart.html', file_s
 
     # Line chart for BTC price
     fig2 = px.line(btc_data, x='Date', y='Closing Price (USD)')
-    fig2.update_traces(yaxis="y2", line=dict(width=2, color='#E4D00A'), name = 'BTC price')
+    fig2.update_traces(yaxis="y2", line=dict(width=2, color='#E4D00A'), name = 'Bitcoin price')
 
     # Update 2 charts into the main chart
     subfig.add_traces(fig.data + fig2.data)
     subfig.update_xaxes(title_text="", rangeslider_visible=True) #, type='date')
     subfig.layout.yaxis.title="Balance change (BTC)"
-    subfig.layout.yaxis2.title="Price (USD)"
+    subfig.layout.yaxis2.title="Bitcoin Price (USD)"
     subfig.update_traces(
         showlegend=True,
         hovertemplate = 'Change: %{y} BTC<extra></extra>', #y:.2f
