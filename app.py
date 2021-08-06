@@ -11,6 +11,7 @@ import plotly.offline as py
 import plotly.express as px
 
 import os#, time
+import PIL.Image
 from utils import *
 
 # Define arguments
@@ -31,9 +32,30 @@ if args['streamlit']:
         page_title="DAISTATS status",
         page_icon="🚀", layout="wide",initial_sidebar_state='auto'
     )
-    st.title("**✮** DaiStats Report **✮**")
-    st.subheader("Status of [MAKER](https://oasis.app/) Vaults")
-    st.markdown("Data is obtained from [DaiStats](https://daistats.com)")
+    hide_streamlit_style = """
+            <style>
+            footer {
+	        visibility: hidden;
+	            }
+            footer:after {
+	            content:'© 2021 Nhu Hoang. Powered by Streamlit';
+	            visibility: visible;
+	            display: block;
+	            position: relative;
+	            #background-color: red;
+	            padding: 5px;
+	            top: 2px;
+                    }
+            </style>
+            """
+    st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+    #st.title("**✮** DaiStats Report **✮**")
+    st.image(PIL.Image.open("title_img.png"), use_column_width=False)
+    #st.subheader("Status of [MAKER](https://oasis.app/) Vaults")
+    st.subheader("""
+        Tracking the movement of &nbsp[![MAKER](https://img.shields.io/static/v1?label=Oasis&message=MakerDao&color=fda300&logo=MakerBot&style=for-the-badge)](https://oasis.app/) vaults.
+        With data obtained from [DaiStats](https://daistats.com)
+    """)
 else:
     pass
 
@@ -131,7 +153,11 @@ if args['streamlit']:
 #===============================================================#
 
 st.markdown("# 🐳 **RICH WALLET MOVEMENT** 🐳")
-st.markdown("### Movement of the third richest Bitcoin wallet. Source data on [bitinfocharts](https://bitinfocharts.com/bitcoin/address/1P5ZEDWTKTFGxQjZphgWPQUpe554WKDfHQ)")
+#st.markdown("### Movement of the third richest Bitcoin wallet. Source data on [bitinfocharts](https://bitinfocharts.com/bitcoin/address/1P5ZEDWTKTFGxQjZphgWPQUpe554WKDfHQ)")
+st.markdown("""
+    ### Movement of the third richest Bitcoin wallet.
+    Source data on &nbsp[![bitinfocharts](https://img.shields.io/static/v1?label=Bitinfocharts&message=Source&color=fda300&logo=Bitcoin&style=for-the-badge)](https://bitinfocharts.com/bitcoin/address/1P5ZEDWTKTFGxQjZphgWPQUpe554WKDfHQ)
+""")
 st.write('')
 
 # Load data
@@ -202,3 +228,12 @@ fig4 = balance_diff(
 
 if args['streamlit']:
     st.plotly_chart(fig4, use_container_width=True)
+
+st.subheader("About this app")
+st.markdown("""
+Made and maintained by &nbsp[![Nhu Hoang](https://img.shields.io/static/v1?label=&message=Nhu%20Hoang&color=1f4762&logo=Netlify)](https://geniusnhu.netlify.app/)
+
+Take a look at the &nbsp[![Source code](https://img.shields.io/static/v1?label=GitHub&message=Source%20code&color=fda300&logo=GitHub&?logoColor=1f4762)](https://github.com/geniusnhu/daistats)
+""")
+
+#https://img.shields.io/badge/-Source_code-1f4762&?style=social&logo=GitHub
