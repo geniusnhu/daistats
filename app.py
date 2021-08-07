@@ -161,21 +161,26 @@ st.markdown("""
 st.write('')
 
 # Load data
-data = pd.read_csv('rich_wallet.csv')
-data['timestamp_date'] = data['timestamp'].map(lambda x: str(x).split(' ')[0])
+data_wallet = pd.read_csv('rich_wallet.csv')
+data_wallet['timestamp_date'] = data_wallet['timestamp'].map(lambda x: str(x).split(' ')[0])
 # Load BTC price data
 btc_data = pd.read_csv('BTC_price.csv')
-btc_data = btc_data[btc_data['Date']>=data['timestamp_date'].min()]
+btc_data = btc_data[btc_data['Date']>=data_wallet['timestamp_date'].min()]
 
 # DCA price
-DCA_price = data['Amount'] * data['Realized price']
-DCA_price = round(DCA_price.sum()/data.loc[0,'Balance'], 2)
+DCA_price = data_wallet['Amount'] * data_wallet['Realized price']
+DCA_price = round(DCA_price.sum()/data_wallet.loc[0,'Balance'], 2)
 st.markdown(f"### DCA price: ${DCA_price:,}")
 
 # Plot figures ------------------------------------------------
 # TOTAL BALANCE------------------------------------------------
-data = data.groupby('timestamp_date').agg({'Amount': 'sum', 'Realized price': 'mean'}).reset_index(drop=False)
-data['Balance'] = data['Amount'].cumsum()
+def get_final(x):
+    x = x[0]
+    return x
+
+data = data_wallet.groupby('timestamp_date').agg(
+    {'Amount': 'sum', 'Realized price': 'mean', 'Balance': 'first'}
+).reset_index(drop=False)
 data['Balance USD'] = data['Balance'] * data['Realized price']
 data = data.dropna()
 data['timestamp_date'] = pd.DatetimeIndex(data['timestamp_date'])
