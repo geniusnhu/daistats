@@ -82,7 +82,7 @@ if args['streamlit']:
     st.markdown('## **OVERVIEW**')
     st.plotly_chart(fig1)
 
-st.markdown("--")
+st.markdown("---")
 
 #===============================================================#
 # SELECT VAULT AND IN-DEPT MOVEMENT
@@ -93,60 +93,70 @@ sorted_vaults = data.groupby('vault_name')['current_loan'].sum()\
 
 st.markdown("# **IN-DEPT MOVEMENT**")
 st.markdown("### Choose one or several vaults below and explore In-dept movement")
-st.markdown("### **Select Vault:**")
+st.markdown("### **Select Vault**")
 
 sorted_vault = st.multiselect(
-    'Choose one or several vaults in-dept performance', sorted_vaults, default=['ETH-A'],
-    #help = 'Test help'
+    'Choose one or several vaults for in-dept performance', sorted_vaults, default=['ETH-A'],
 )
 
 # Filter df based on selection---------------------------------
 vault_df = data[data['vault_name'].isin(sorted_vault)]
 vault_df['timestamp_date'] = vault_df['timestamp'].map(lambda x: str(x).split(' ')[0])
+# Get the last data of the date
+vault_df= vault_df.sort_values(by = 'timestamp').groupby('timestamp_date').first().reset_index()
 
-if len(sorted_vault) == 1:
-    st.markdown(f"### Current vault fee: " +\
-                f"{vault_df.loc[vault_df['timestamp_date']==np.max(vault_df['timestamp_date']),'fee'].values[0]}")
+if len(sorted_vault) == 0:
+    st.success("No vault chosen. Please choose a vault name above !")
 else:
-    vault_df = vault_df.groupby(['vault_name','timestamp_date']).mean().reset_index(drop=False)
-    vault_df = vault_df.groupby('timestamp_date').sum().reset_index(drop=False)
+    if len(sorted_vault) == 1:
+        st.markdown(f"### Current vault fee: " +\
+                    f"{vault_df.loc[vault_df['timestamp_date']==np.max(vault_df['timestamp_date']),'fee'].values[0]}")
 
-# Plot figures ------------------------------------------------
-col1, col2 = st.beta_columns(2)
+    else:
+        #vault_df = vault_df.groupby(['vault_name','timestamp_date']).mean().reset_index(drop=False)
+        vault_df = vault_df.groupby('timestamp_date').sum().reset_index(drop=False)
 
-fig1 = movement_chart(
-    data=vault_df, fig_name=result_path + "USDC_loan.html", chart_title = '',
-    file_save=args['fig_save']
-)
-if args['streamlit']:
-    with col1:
-        col1.header('Vault loan amount')
-        st.plotly_chart(fig1, use_container_width=True)
-else:
-    pass
+    # Plot figures ------------------------------------------------
+    col1, col2 = st.columns(2)
 
-# Daily changes in coin locked vs the previous day
-fig2 = coin_diff(
-    vault_df, chart_title = '',
-    fig_name=result_path + "ETHA_daily_diff.html",
-    file_save=args['fig_save']
-)
+    fig1 = movement_chart(
+        data=vault_df, fig_name=result_path + "USDC_loan.html", chart_title = '',
+        file_save=args['fig_save']
+    )
+    if args['streamlit']:
+        with col1:
+            col1.header('Vault loan amount')
+            st.plotly_chart(fig1, use_container_width=True)
+    else:
+        pass
 
-if len(sorted_vault) == 1:
-    coin = sorted_vault[0].split('-')[0]
-else:
-    coin = ', '.join(list(set([i.split('-')[0] for i in sorted_vault])))
-if args['streamlit']:
-    with col2:
-        col2.header(f'Changes in {coin} locked')
-        col2.subheader('')
-        st.plotly_chart(fig2, use_container_width=True)
-        with st.beta_expander("See explanation"):
-            st.write("""
-                Net Change in amount of coin(s) locked vs previous day. The illustrated number is the total number of coins regardless its difference in nature.
+    # Daily changes in coin locked vs the previous day
+    fig2 = coin_diff(
+        vault_df, chart_title = '',
+        fig_name=result_path + "ETHA_daily_diff.html",
+        file_save=args['fig_save']
+    )
 
-                *Note that data of different vaults might not be updated with the same timestamp*
-                """)
+    if len(sorted_vault) == 1:
+        coin = sorted_vault[0].split('-')[0]
+    else:
+        coin = ', '.join(list(set([i.split('-')[0] for i in sorted_vault])))
+    if args['streamlit']:
+        with col2:
+            col2.header(f'Changes in {coin} locked')
+            col2.subheader('')
+            st.plotly_chart(fig2, use_container_width=True)
+            with st.expander("See explanation"):
+                st.markdown("""
+                    Net Change in amount of coin(s) locked vs previous period.
+
+                    When choosing several vaults at the same time,
+                    the number might observe some unusual fluctuation due to the difference in vault updated timestamp.
+
+                    It is recommended to see one vault data at a time.
+                    """)
+
+st.markdown("---")
 
 #===============================================================#
 # RICH WALLET MOVEMENT
@@ -199,7 +209,7 @@ else:
 if args['streamlit']:
     st.markdown("## Changes in balance")
 
-col3, _ = st.beta_columns(2)
+col3, _ = st.columns(2)
 
 with col3:
     DT = ('Date', "Week",'Month', 'Year')
@@ -217,8 +227,7 @@ elif DT_option == 'Year':
     data_diff = data_diff[(data_diff['Amount']>=0.1) | (data_diff['Amount']<=-0.1)]
 elif DT_option == 'Week':
     data_diff = data.copy()
-    data_diff['timestamp_date'] = data_diff['timestamp_date'].dt.strftime('%Y-%U')
-    print(data_diff)
+    data_diff['timestamp_date'] = data_diff['timestamp_date'].dt.strftime('%Y-%W').map(lambda x: process(x))
     data_diff = data_diff.groupby('timestamp_date').sum().reset_index(drop=False)
     data_diff = data_diff[(data_diff['Amount']>=0.1) | (data_diff['Amount']<=-0.1)]
 else:
