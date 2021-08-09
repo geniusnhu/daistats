@@ -47,8 +47,8 @@ def movement_chart(data, chart_title = '', fig_name='chart.html', file_save=Fals
     fig.update_yaxes(title_text="Vault coin locked amount", secondary_y=True)
     fig.update_layout(
         legend=dict(
-            yanchor="top",
-            y=0.99,
+            yanchor="bottom",
+            y=0.1,
             xanchor="left",
             x=0.01
         ),

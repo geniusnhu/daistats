@@ -49,9 +49,7 @@ if args['streamlit']:
             </style>
             """
     st.markdown(hide_streamlit_style, unsafe_allow_html=True)
-    #st.title("**✮** DaiStats Report **✮**")
     st.image(PIL.Image.open("title_img.png"), use_column_width=False)
-    #st.subheader("Status of [MAKER](https://oasis.app/) Vaults")
     st.subheader("""
         Tracking the movement of &nbsp[![MAKER](https://img.shields.io/static/v1?label=Oasis&message=MakerDao&color=fda300&logo=MakerBot&style=for-the-badge)](https://oasis.app/) vaults.
         With data obtained from [DaiStats](https://daistats.com)
