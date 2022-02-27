@@ -161,3 +161,107 @@ def balance_diff(data, btc_data, chart_title = '', fig_name='chart.html', file_s
     #    subfig.write_html(fig_name)
 
     return subfig
+
+def bitcoin_price_volume(btc_data):
+    # =================== BTC VOLUME (USD) VS PRICE =====================
+    subfig = make_subplots(specs=[[{"secondary_y": True}]])
+    # Bar chart for bitcoin volume
+    fig = px.bar(
+        btc_data, x='Date', y='Volume'
+    )
+    # Line chart for BTC price
+    fig2 = px.line(btc_data, x='Date', y='Closing Price (USD)')
+    fig2.update_traces(yaxis="y2", line=dict(width=2, color='#E4D00A'), name = 'Bitcoin price')
+    # Update 2 charts into the main chart
+    subfig.add_traces(fig.data + fig2.data)
+    subfig.update_xaxes(title_text="") #, rangeslider_visible=True)
+    subfig.update_traces(
+        showlegend=True,
+        hovertemplate = 'Change: %{y} BTC<extra></extra>', #y:.2f
+    )
+    subfig.update_layout(
+        title="<b>"+'BTC volume vs price'+"<b>", #plot_bgcolor='rgb(255, 255, 255)',
+        hovermode="x", template = "none",
+        height=600,
+        legend=dict(
+            yanchor="top",
+            y=0.99,
+            xanchor="left",
+            x=0.01
+        ),
+        yaxis=dict(
+            title="BTC volume in USD",
+            titlefont=dict(
+                color="#1f77b4"
+            ),
+            tickfont=dict(
+                color="#1f77b4"
+            )
+        ),
+        yaxis2=dict(
+            title="BTC price",
+            titlefont=dict(
+                color="#E4D00A"
+            ),
+            tickfont=dict(
+                color="#E4D00A"
+            ),
+            anchor="x",
+            overlaying="y",
+            side="right"
+        ),
+    )
+
+    # =============================== BTC VOLUME (BTC) VS PRICE ==================================
+    subfig2 = make_subplots(specs=[[{"secondary_y": True}]])
+    # Bar chart for bitcoin volume
+    fig = px.bar(
+        btc_data, x='Date', y='Volume in BTC'
+    )
+    fig.update_traces(marker_color='#0ad5e4', name = 'Volume in BTC')
+
+    # Line chart for BTC price
+    fig2 = px.line(btc_data, x='Date', y='Closing Price (USD)')
+    fig2.update_traces(yaxis="y2", line=dict(width=2, color='#E4D00A'), name = 'Bitcoin price')
+
+    # Update 2 charts into the main chart
+    subfig2.add_traces(fig.data + fig2.data)
+    subfig2.update_xaxes(title_text="") #, rangeslider_visible=True)
+    subfig2.update_traces(
+        showlegend=True,
+        hovertemplate = 'Change: %{y} BTC<extra></extra>', #y:.2f
+    )
+    subfig2.update_layout(
+        title="<b>"+'BTC volume (BTC) vs price'+"<b>", #plot_bgcolor='rgb(255, 255, 255)',
+        hovermode="x", template = "none",
+        height=600,
+        legend=dict(
+            yanchor="top",
+            y=0.99,
+            xanchor="left",
+            x=0.01
+        ),
+        yaxis=dict(
+            title="BTC volume in BTC",
+            titlefont=dict(
+                color="#0ad5e4"
+            ),
+            tickfont=dict(
+                color="#0ad5e4"
+            )
+        ),
+        yaxis2=dict(
+            title="BTC price",
+            titlefont=dict(
+                color="#E4D00A"
+            ),
+            tickfont=dict(
+                color="#E4D00A"
+            ),
+            anchor="x",
+            overlaying="y",
+            side="right"
+        ),
+    )
+
+    return subfig, subfig2
