@@ -204,42 +204,44 @@ else:
     pass
 
 # CHANGE IN BALANCE---------------------------------------------
-# if args['streamlit']:
-#     st.markdown("## Changes in balance")
-#
-# col3, _ = st.columns(2)
-#
-# with col3:
-#     DT = ('Date', "Week",'Month', 'Year')
-#     DT_option = col3.selectbox(label = 'CHOOSE RESOLUTION', options = DT, index=0, help='Balance data is accumulated by selected resolution')
-#
-# if DT_option == 'Month':
-#     data_diff = data.copy()
-#     data_diff['timestamp_date'] = pd.DatetimeIndex(data_diff['timestamp_date'].dt.strftime('%m-%Y'))
-#     data_diff = data_diff.groupby('timestamp_date').sum().reset_index(drop=False)
-#     data_diff = data_diff[(data_diff['Amount']>=0.1) | (data_diff['Amount']<=-0.1)]
-# elif DT_option == 'Year':
-#     data_diff = data.copy()
-#     data_diff['timestamp_date'] = pd.DatetimeIndex(data_diff['timestamp_date'].dt.strftime('%Y'))
-#     data_diff = data_diff.groupby('timestamp_date').sum().reset_index(drop=False)
-#     data_diff = data_diff[(data_diff['Amount']>=0.1) | (data_diff['Amount']<=-0.1)]
-# elif DT_option == 'Week':
-#     data_diff = data.copy()
-#     data_diff['timestamp_date'] = data_diff['timestamp_date'].dt.strftime('%Y-%W').map(lambda x: process(x))
-#     data_diff = data_diff.groupby('timestamp_date').sum().reset_index(drop=False)
-#     data_diff = data_diff[(data_diff['Amount']>=0.1) | (data_diff['Amount']<=-0.1)]
-# else:
-#     data_diff = data.copy(
-#     data_diff = data_diff[(data_diff['Amount']>=0.1) | (data_diff['Amount']<=-0.1)]
-#
-# fig4 = balance_diff(
-#     data_diff, btc_data, chart_title = '',
-#     fig_name=result_path + "wallet_diff.html",
-#     file_save=args['fig_save']
-# )
-#
-# if args['streamlit']:
-#     st.plotly_chart(fig4, use_container_width=True)
+if args['streamlit']:
+    st.markdown("## Changes in balance")
+
+col3, _ = st.columns(2)
+
+with col3:
+    DT = ('Date', "Week",'Month', 'Year')
+    DT_option = col3.selectbox(label = 'CHOOSE RESOLUTION', options = DT, index=0, help='Balance data is accumulated by selected resolution')
+
+if DT_option == 'Month':
+    data_diff = data.copy()
+    data_diff['timestamp_date'] = pd.DatetimeIndex(data_diff['timestamp_date'].dt.strftime('%m-%Y'))
+    data_diff = data_diff.groupby('timestamp_date').sum().reset_index(drop=False)
+    data_diff = data_diff[(data_diff['Amount']>=0.1) | (data_diff['Amount']<=-0.1)]
+elif DT_option == 'Year':
+    data_diff = data.copy()
+    data_diff['timestamp_date'] = pd.DatetimeIndex(data_diff['timestamp_date'].dt.strftime('%Y'))
+    data_diff = data_diff.groupby('timestamp_date').sum().reset_index(drop=False)
+    data_diff = data_diff[(data_diff['Amount']>=0.1) | (data_diff['Amount']<=-0.1)]
+elif DT_option == 'Week':
+    data_diff = data.copy()
+    data_diff['timestamp_date'] = data_diff['timestamp_date'].dt.strftime('%Y-%W').map(lambda x: process(x))
+    data_diff = data_diff.groupby('timestamp_date').sum().reset_index(drop=False)
+    data_diff = data_diff[(data_diff['Amount']>=0.1) | (data_diff['Amount']<=-0.1)]
+else:
+    data_diff = data.copy()
+    data_diff = data_diff[(data_diff['Amount']>=0.1) | (data_diff['Amount']<=-0.1)]
+
+fig4 = balance_diff(
+    data_diff, btc_data, chart_title = '',
+    fig_name=result_path + "wallet_diff.html",
+    file_save=args['fig_save']
+)
+
+
+if args['streamlit']:
+    st.plotly_chart(fig4, use_container_width=True)
+
 
 # BTC VOLUME VS PRICE ---------------------------------------------
 fig5, fig6 = bitcoin_price_volume(btc_data)
